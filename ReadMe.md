@@ -14,14 +14,14 @@ To build on Windows link to Winsock2 (`Ws2_32`).
 ## Examples
 See [`examples/`](https://github.com/benhenshaw/quick_udp/tree/master/examples) for more.
 
-#### Usage
+#### Usage:
 Include the file like this in ONE source file then use as a normal header file in any others:
 ```C
 #define QUICK_UDP_IMPLEMENTATION
 #include "quick_udp.h"
 ```
 
-#### Send a packet.
+#### Send a packet:
 ```C
 qu_init();
 
@@ -33,7 +33,7 @@ qu_send(&handle, "Hello", 5);
 qu_shutdown();
 ```
 
-#### Receive a packet.
+#### Receive a packet:
 ```C
 qu_init();
 
