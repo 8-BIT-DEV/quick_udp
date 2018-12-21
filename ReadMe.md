@@ -7,6 +7,7 @@ A simple single-header library for UDP networking.
 - No malloc - you supply storage for everything.
 - Complete flow control (no call-backs), with non-blocking and blocking modes.
 - No protocol, just sending and receiving of UDP packets.
+- Public domain.
 
 To build on Windows link to Winsock2 (`Ws2_32`).
 
