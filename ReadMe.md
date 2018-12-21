@@ -26,7 +26,7 @@ Include the file like this in ONE source file then use as a normal header file i
 qu_init();
 
 qu_handle handle;
-int success = qu_connect(&handle, "localhost", 1996);
+int success = qu_connect(&handle, "localhost", 4848);
 if (!success) exit(1);
 qu_send(&handle, "Hello", 5);
 
@@ -38,7 +38,7 @@ qu_shutdown();
 qu_init();
 
 qu_handle handle;
-int success = qu_listen(&handle, 1996);
+int success = qu_listen(&handle, 4848);
 if (!success) exit(1);
 
 char buffer[1024];
