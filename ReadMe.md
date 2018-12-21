@@ -51,7 +51,7 @@ puts(buffer);
 qu_shutdown();
 ```
 
-## Entire API
+## Entire API
 
 ```C
 int qu_init(void);
