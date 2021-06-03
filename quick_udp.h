@@ -12,7 +12,9 @@
 //      #define QUICK_UDP_IMPLEMENTATION
 //      #include "quick_udp.h"
 //
-// by Benedict Henshaw, 2018-12-21
+// by Benedict Henshaw
+// https://github.com/benhenshaw/quick_udp
+//
 // PUBLIC DOMAIN - See license at the end of this file.
 //
 
@@ -84,11 +86,12 @@ int qu_connect(qu_handle * handle, char * address, int port);
 
 // Close the handle when you are finished with it.
 // Only affects handles obtained from qu_connect and qu_listen.
-// (You don't need to call this on sender handles from qu_receive.)
+// You don't need to call this on sender handles from qu_receive.
 void qu_close(qu_handle * handle);
 
 // Receive a packet sent to this handle.
-// Returns 1 on success, 0 on failure.
+// Returns the number of bytes received. If this handle is non-blocking
+// and there are no packets waiting to be received then it will return 0.
 // handle
 //      A handle obtained from qu_listen or qu_connect.
 // sender
@@ -106,6 +109,7 @@ int qu_receive(qu_handle * handle, qu_handle * sender,
 
 // Send data to an existing handle. This could be a handle from a call to
 // qu_connect, or a sender handle from qu_receive.
+// Returns the number of bytes actually sent.
 // handle
 //      The handle to send data to.
 // data
@@ -116,6 +120,7 @@ int qu_send(qu_handle * handle, void * data, int byte_count);
 
 // Calls to qu_receive are blocking by default, but you can make them
 // non-blocking by using qu_disable_blocking.
+// Returns 1 if change was made successfully, 0 on error.
 // handle
 //      The handle to modify.
 // disable_blocking
@@ -133,6 +138,7 @@ int qu_disable_blocking(qu_handle * handle, int disable_blocking);
 //      The handle to wait for packets from.
 // timeout_ms
 //      The number of milliseconds to wait for a packet.
+//      Pass 0 to wait indefinitely.
 int qu_wait(qu_handle * handle, int timeout_ms);
 
 // Compare two handles to see if they are the same. Most common  use
@@ -143,6 +149,7 @@ int qu_wait(qu_handle * handle, int timeout_ms);
 // state changes, their handle may change.
 // If you need to strongly verify where a packet is from you will
 // need to employ additional methods of verification.
+// Returns 1 if handles appear the same, 0 if not.
 int qu_compare(qu_handle * a, qu_handle * b);
 
 #ifdef __cplusplus
@@ -314,18 +321,18 @@ int qu_receive(qu_handle * handle, qu_handle * sender, void * buffer, size_t buf
 
 int qu_disable_blocking(qu_handle * handle, int disable_blocking)
 {
-    if (handle->socket == INVALID_SOCKET) return -1;
+    if (handle->socket == INVALID_SOCKET) return 0;
 
 #ifdef _WIN32
     unsigned long n = (disable_blocking != 0);
-    int result = ioctlsocket(handle->socket, FIONBIO, &n);
-    return result;
+    int error = ioctlsocket(handle->socket, FIONBIO, &n);
+    return !error;
 #else
     int flags = fcntl(handle->socket, F_GETFL);
     if (flags == -1) return -1;
     if (disable_blocking) flags |= O_NONBLOCK; else flags &= ~O_NONBLOCK;
     int result = fcntl(handle->socket, F_SETFL, flags);
-    return result;
+    return !!(result & O_NONBLOCK);
 #endif
 }
 
