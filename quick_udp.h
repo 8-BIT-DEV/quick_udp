@@ -256,7 +256,6 @@ int qu_connect(qu_handle * handle, char * address, int port)
     int result = getaddrinfo(address, port_string, &hints, &info_list);
     if (result != 0)
     {
-        fputs(gai_strerror(result), stderr);
         return 0;
     }
 
